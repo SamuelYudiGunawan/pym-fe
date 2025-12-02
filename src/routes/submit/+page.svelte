@@ -6,16 +6,27 @@
   let content = '';
   let submitting = false;
   let postAsAnonymous = false; // Option for logged-in users
+  let errorMessage = '';
 
   // Reactive: determine author name and anonymous status based on auth
   $: authorName = $auth.authenticated && !postAsAnonymous ? $auth.user.username : '';
   $: isAnonymous = !$auth.authenticated || postAsAnonymous;
 
+  function clearError() {
+    errorMessage = '';
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
+    clearError();
 
     if (!content.trim()) {
-      alert('Please write something before posting');
+      errorMessage = 'Please write something before posting';
+      return;
+    }
+
+    if (content.trim().length < 10) {
+      errorMessage = 'Please write at least 10 characters';
       return;
     }
 
@@ -32,7 +43,9 @@
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create note');
+        const errorData = await response.json();
+        const errorMsg = errorData.errors?.content?.[0] || errorData.error || 'Failed to create note';
+        throw new Error(errorMsg);
       }
 
       const newNote = await response.json();
@@ -40,7 +53,7 @@
       // Redirect to home page after successful submission
       goto('/');
     } catch (error) {
-      alert('Error posting your thought: ' + error.message);
+      errorMessage = error.message;
       submitting = false;
     }
   }
@@ -64,13 +77,18 @@
         <textarea
           id="content"
           bind:value={content}
+          on:input={clearError}
           placeholder="What's on your mind? Share your thoughts, feelings, or ideas..."
           rows="12"
           required
           disabled={submitting}
+          class:textarea-error={errorMessage}
         ></textarea>
-        <div class="char-count">
-          {content.length} characters
+        <div class="char-info">
+          <span class="char-count">{content.length} characters</span>
+          {#if errorMessage}
+            <span class="error-text">{errorMessage}</span>
+          {/if}
         </div>
       </div>
 
@@ -183,11 +201,27 @@
     cursor: not-allowed;
   }
 
+  .textarea-error {
+    border-color: #dc2626 !important;
+    background-color: #fef2f2;
+  }
+
+  .char-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+  }
+
   .char-count {
-    text-align: right;
     color: var(--color-text-light);
     font-size: 0.9rem;
-    margin-top: 0.5rem;
+  }
+
+  .error-text {
+    color: #dc2626;
+    font-size: 0.9rem;
+    font-weight: 500;
   }
 
   .posting-as {

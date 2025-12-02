@@ -13,8 +13,13 @@
 	// Reply form data
 	let replyContent = '';
 	let replyAsAnonymous = false; // Option for logged-in users
+	let replyError = '';
 
 	$: noteId = $page.params.id;
+
+	function clearReplyError() {
+		replyError = '';
+	}
 
 	// Reactive: determine author name and anonymous status based on auth
 	$: replyAuthor = $auth.authenticated && !replyAsAnonymous ? $auth.user.username : '';
@@ -42,9 +47,15 @@
 
 	async function handleSubmitReply(event) {
 		event.preventDefault();
+		clearReplyError();
 
 		if (!replyContent.trim()) {
-			alert('Please write a reply');
+			replyError = 'Please write a reply';
+			return;
+		}
+
+		if (replyContent.trim().length < 5) {
+			replyError = 'Please write at least 5 characters';
 			return;
 		}
 
@@ -61,7 +72,10 @@
 			});
 
 			if (!response.ok) {
-				throw new Error('Failed to post reply');
+				const errorData = await response.json();
+				const errorMsg =
+					errorData.errors?.content?.[0] || errorData.error || 'Failed to post reply';
+				throw new Error(errorMsg);
 			}
 
 			// Refresh the note to get updated replies
@@ -69,10 +83,11 @@
 
 			// Reset form
 			replyContent = '';
+			replyAsAnonymous = false;
 
 			submittingReply = false;
 		} catch (err) {
-			alert('Error posting reply: ' + err.message);
+			replyError = err.message;
 			submittingReply = false;
 		}
 	}
@@ -153,11 +168,16 @@
 
 				<textarea
 					bind:value={replyContent}
+					on:input={clearReplyError}
 					placeholder="Write your reply..."
 					rows="4"
 					required
 					disabled={submittingReply}
+					class:textarea-error={replyError}
 				></textarea>
+				{#if replyError}
+					<span class="error-text">{replyError}</span>
+				{/if}
 
 				<div class="form-options">
 					<div class="posting-as">
@@ -334,6 +354,20 @@
 	textarea:focus {
 		outline: none;
 		border-color: var(--color-light-blue);
+	}
+
+	.textarea-error {
+		border-color: #dc2626 !important;
+		background-color: #fef2f2;
+	}
+
+	.error-text {
+		display: block;
+		color: #dc2626;
+		font-size: 0.9rem;
+		font-weight: 500;
+		margin-top: -0.5rem;
+		margin-bottom: 1rem;
 	}
 
 	.form-options {
