@@ -1,5 +1,6 @@
 // API Configuration
-// In production, update this to your deployed backend URL
+// 
+// For Vercel: Set VITE_API_URL environment variable to your ngrok URL
+// Example: https://unrationed-nondisparate-sharmaine.ngrok-free.dev/api
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-
+export const API_URL = import.meta.env.VITE_API_URL || 'https://unrationed-nondisparate-sharmaine.ngrok-free.dev/api';
