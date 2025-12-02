@@ -1,7 +1,7 @@
 <script>
   import { goto } from '$app/navigation';
   import { auth } from '$lib/stores/auth.js';
-  import { API_URL } from '$lib/config.js';
+  import { apiFetch } from '$lib/config.js';
   
   let content = '';
   let submitting = false;
@@ -22,12 +22,8 @@
     submitting = true;
 
     try {
-      const response = await fetch(`${API_URL}/notes/submit/`, {
+      const response = await apiFetch('/notes/submit/', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
         body: JSON.stringify({
           content: content,
           author_name: authorName,

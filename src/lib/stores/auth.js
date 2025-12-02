@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { API_URL } from '$lib/config.js';
+import { apiFetch } from '$lib/config.js';
 
 function createAuthStore() {
   const { subscribe, set, update } = writable({
@@ -14,9 +14,7 @@ function createAuthStore() {
     // Check if user is logged in
     async checkAuth() {
       try {
-        const response = await fetch(`${API_URL}/auth/user/`, {
-          credentials: 'include'
-        });
+        const response = await apiFetch('/auth/user/');
         
         if (response.ok) {
           const data = await response.json();
@@ -37,12 +35,8 @@ function createAuthStore() {
     // Login
     async login(username, password) {
       try {
-        const response = await fetch(`${API_URL}/auth/login/`, {
+        const response = await apiFetch('/auth/login/', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
           body: JSON.stringify({ username, password })
         });
 
@@ -66,12 +60,8 @@ function createAuthStore() {
     // Register
     async register(username, password, email) {
       try {
-        const response = await fetch(`${API_URL}/auth/register/`, {
+        const response = await apiFetch('/auth/register/', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
           body: JSON.stringify({ username, password, email })
         });
 
@@ -95,9 +85,8 @@ function createAuthStore() {
     // Logout
     async logout() {
       try {
-        await fetch(`${API_URL}/auth/logout/`, {
-          method: 'POST',
-          credentials: 'include'
+        await apiFetch('/auth/logout/', {
+          method: 'POST'
         });
         
         set({ user: null, authenticated: false, loading: false });
@@ -110,4 +99,3 @@ function createAuthStore() {
 }
 
 export const auth = createAuthStore();
-

@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { API_URL } from '$lib/config.js';
+	import { apiFetch } from '$lib/config.js';
 
 	let notes = [];
 	let loading = true;
@@ -8,7 +8,7 @@
 
 	onMount(async () => {
 		try {
-			const response = await fetch(`${API_URL}/notes/`);
+			const response = await apiFetch('/notes/');
 			if (!response.ok) {
 				throw new Error('Failed to fetch notes');
 			}

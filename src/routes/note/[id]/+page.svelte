@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { auth } from '$lib/stores/auth.js';
-	import { API_URL } from '$lib/config.js';
+	import { apiFetch } from '$lib/config.js';
 
 	let note = null;
 	let replies = [];
@@ -26,7 +26,7 @@
 
 	async function fetchNote() {
 		try {
-			const response = await fetch(`${API_URL}/notes/${noteId}/`);
+			const response = await apiFetch(`/notes/${noteId}/`);
 			if (!response.ok) {
 				throw new Error('Note not found');
 			}
@@ -51,12 +51,8 @@
 		submittingReply = true;
 
 		try {
-			const response = await fetch(`${API_URL}/notes/${noteId}/replies/`, {
+			const response = await apiFetch(`/notes/${noteId}/replies/`, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				credentials: 'include',
 				body: JSON.stringify({
 					content: replyContent,
 					author_name: replyAuthor,
