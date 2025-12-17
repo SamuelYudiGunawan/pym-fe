@@ -1,0 +1,43 @@
+# Git
+.git
+.gitignore
+
+# Dependencies
+node_modules/
+
+# Build output
+build/
+.svelte-kit/
+
+# Environment
+.env
+.env.*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Kubernetes manifests
+k8s/
+
+# Documentation
+*.md
+LICENSE
+
+# Tests
+tests/
+coverage/
+.nyc_output/
+
+# Misc
+.DS_Store
+Thumbs.db
+
+

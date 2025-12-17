@@ -1,0 +1,12 @@
+# ConfigMap for SvelteKit Frontend
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: pour-your-mind
+data:
+  # ORIGIN is required for SvelteKit CSRF protection
+  # Update this to the frontend LoadBalancer IP after deployment
+  ORIGIN: "http://localhost:3000"
+
+
